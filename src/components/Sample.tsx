@@ -1,4 +1,5 @@
 import { useMutation } from "../hooks/useMutation";
+import { getApiUrl } from "../providers/ApiProvider";
 
 interface ResponseType {
   id: number;
@@ -12,18 +13,26 @@ interface RequestType {
 }
 
 function Sample() {
-  const { mutation, isLoading, abort } = useMutation<ResponseType, RequestType>({
-    url: "https://jsonplaceholder.typicode.com/posts",
-    method: "POST",
-    onSuccess(data) {
-      console.log("Success", data);
-    },
-    onError(error) {
-      console.log("Error", error);
-    },
-  });
+  const { mutation, isLoading, abort } = useMutation<ResponseType, RequestType>(
+    {
+      url: getApiUrl(),
+      method: "POST",
+      onSuccess(data) {
+        console.log("Success", data);
+      },
+      onError(error) {
+        console.log("Error", error);
+      },
+    }
+  );
 
-  const handleSubmit = async () => {
+  const handleSubmitClassic = () =>
+    mutation({
+      title: "New Title",
+      body: "New Body",
+    });
+
+  const handleSubmitPromise = async () => {
     const newBody = {
       title: "New Title",
       body: "New Body",
@@ -31,20 +40,48 @@ function Sample() {
 
     try {
       const response = await mutation(newBody);
-      console.log("Response: ", response.data);
+      console.log("Response en promesse: ", response.data);
     } catch (error) {
       console.error("Error :", error);
     }
   };
+
+  // Possibilité d'interrompre de la requête en cours
+  const handleSubmitAbort = () => {
+    mutation({
+      title: "foo",
+      body: "bar",
+    });
+    abort();
+  };
+
   return (
-    <div>
-      <button onClick={handleSubmit} disabled={isLoading}>
-        {isLoading ? "Loading" : "Submit"}
-      </button>
-      <button onClick={abort} disabled={!isLoading}>
-        Abort
-      </button>
-    </div>
+    <>
+      <div>
+        <button onClick={handleSubmitClassic} disabled={isLoading}>
+          {isLoading ? "Loading" : "Submit Classic"}
+        </button>
+        <button onClick={abort} disabled={!isLoading}>
+          Abort
+        </button>
+      </div>
+      <div>
+        <button onClick={handleSubmitPromise} disabled={isLoading}>
+          {isLoading ? "Loading" : "Submit Promise"}
+        </button>
+        <button onClick={abort} disabled={!isLoading}>
+          Abort
+        </button>
+      </div>
+      <div>
+        <button onClick={handleSubmitAbort} disabled={isLoading}>
+          {isLoading ? "Loading" : "Submit Abort"}
+        </button>
+        <button onClick={abort} disabled={!isLoading}>
+          Abort
+        </button>
+      </div>
+    </>
   );
 }
 
