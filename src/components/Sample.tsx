@@ -16,7 +16,6 @@ function Sample() {
   const { mutation, isLoading, abort } = useMutation<ResponseType, RequestType>(
     {
       url: getApiUrl(),
-      method: "POST",
       onSuccess(data) {
         console.log("Success", data);
       },
