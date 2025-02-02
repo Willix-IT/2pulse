@@ -2,17 +2,20 @@ import { useState, useCallback } from "react";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { UseMutationOptions, UseMutationResults } from "../types/apiTypes";
 
-export function useMutation<Data, Body>({
+export function useMutation<ResponseType, RequestType>({
   url,
   method = "POST",
   onSuccess,
   onError,
-}: UseMutationOptions<Data>): UseMutationResults<Data, Body> {
+}: UseMutationOptions<ResponseType>): UseMutationResults<
+  ResponseType,
+  RequestType
+> {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const controller = new AbortController();
 
   const mutation = useCallback(
-    async (body: Body) => {
+    async (body: RequestType) => {
       setIsLoading(true);
 
       try {
@@ -23,7 +26,7 @@ export function useMutation<Data, Body>({
           signal: controller.signal,
         };
 
-        const response: AxiosResponse<Data> = await axios(config);
+        const response: AxiosResponse<ResponseType> = await axios(config);
 
         if (onSuccess) {
           onSuccess(response.data);

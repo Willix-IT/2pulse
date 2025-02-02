@@ -1,18 +1,18 @@
 import { useMutation } from "../hooks/useMutation";
 
-interface SampleData {
+interface ResponseType {
   id: number;
   title: string;
   body: string;
 }
 
-interface SampleBody {
+interface RequestType {
   title: string;
   body: string;
 }
 
 function Sample() {
-  const { mutation, isLoading, abort } = useMutation<SampleData, SampleBody>({
+  const { mutation, isLoading, abort } = useMutation<ResponseType, RequestType>({
     url: "https://jsonplaceholder.typicode.com/posts",
     method: "POST",
     onSuccess(data) {
