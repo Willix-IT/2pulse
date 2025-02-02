@@ -49,8 +49,8 @@ function Sample() {
   // Possibilité d'interrompre de la requête en cours
   const handleSubmitAbort = () => {
     mutation({
-      title: "foo",
-      body: "bar",
+      title: "New Title",
+      body: "New Body",
     });
     abort();
   };

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { UseMutationOptions, UseMutationResults } from "../types/apiTypes";
 
@@ -12,7 +12,7 @@ export function useMutation<ResponseType, RequestType>({
   RequestType
 > {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const controller = new AbortController();
+  const controllerRef = useRef(new AbortController());
 
   const mutation = useCallback(
     async (body: RequestType) => {
@@ -23,7 +23,7 @@ export function useMutation<ResponseType, RequestType>({
           url,
           method,
           data: body,
-          signal: controller.signal,
+          signal: controllerRef.current.signal,
         };
 
         const response: AxiosResponse<ResponseType> = await axios(config);
@@ -41,13 +41,15 @@ export function useMutation<ResponseType, RequestType>({
         throw error;
       } finally {
         setIsLoading(false);
+        controllerRef.current = new AbortController();
       }
     },
     [url, method, onSuccess, onError]
   );
 
   const abort = useCallback(() => {
-    controller.abort();
+    controllerRef.current.abort();
+    console.log("Request Aborted")
   }, []);
 
   return { mutation, isLoading, abort };
